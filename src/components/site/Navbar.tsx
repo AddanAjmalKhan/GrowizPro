@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ChevronDown, Phone, Mail } from "lucide-react";
 import { Logo } from "./Logo";
@@ -164,13 +165,22 @@ export function Navbar() {
                   onMouseEnter={() => setHovered(item.label)}
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <a
-                    href={item.href ?? "#"}
-                    className="flex items-center gap-1 text-sm font-semibold text-foreground hover:text-foreground/70 transition-colors px-3 py-2 rounded-full"
-                  >
-                    {item.label}
-                    {item.groups && <ChevronDown className="size-3.5 opacity-60" />}
-                  </a>
+                  {item.href?.startsWith("/") ? (
+                    <Link
+                      to={item.href}
+                      className="flex items-center gap-1 text-sm font-semibold text-foreground hover:text-foreground/70 transition-colors px-3 py-2 rounded-full"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={item.href ?? "#"}
+                      className="flex items-center gap-1 text-sm font-semibold text-foreground hover:text-foreground/70 transition-colors px-3 py-2 rounded-full"
+                    >
+                      {item.label}
+                      {item.groups && <ChevronDown className="size-3.5 opacity-60" />}
+                    </a>
+                  )}
 
                   <AnimatePresence>
                     {item.groups && hovered === item.label && (
@@ -193,13 +203,23 @@ export function Navbar() {
                               )}
                               <div className="flex flex-col">
                                 {g.links.map((l) => (
-                                  <a
-                                    key={l.label}
-                                    href={l.href}
-                                    className="text-sm text-foreground/80 hover:text-foreground hover:bg-lavender px-2 py-1.5 rounded-md transition-all"
-                                  >
-                                    {l.label}
-                                  </a>
+                                  l.href.startsWith("/") ? (
+                                    <Link
+                                      key={l.label}
+                                      to={l.href}
+                                      className="text-sm text-foreground/80 hover:text-foreground hover:bg-lavender px-2 py-1.5 rounded-md transition-all"
+                                    >
+                                      {l.label}
+                                    </Link>
+                                  ) : (
+                                    <a
+                                      key={l.label}
+                                      href={l.href}
+                                      className="text-sm text-foreground/80 hover:text-foreground hover:bg-lavender px-2 py-1.5 rounded-md transition-all"
+                                    >
+                                      {l.label}
+                                    </a>
+                                  )
                                 ))}
                               </div>
                             </div>
@@ -240,12 +260,12 @@ export function Navbar() {
               >
                 <div className="flex flex-col gap-1">
                   {menu.map((item) => (
-                    <details key={item.label} className="group">
-                      <summary className="flex items-center justify-between text-sm font-semibold py-2.5 px-2 rounded-lg cursor-pointer hover:bg-accent/60">
-                        {item.label}
-                        {item.groups && <ChevronDown className="size-4 group-open:rotate-180 transition-transform" />}
-                      </summary>
-                      {item.groups && (
+                    item.groups ? (
+                      <details key={item.label} className="group">
+                        <summary className="flex items-center justify-between text-sm font-semibold py-2.5 px-2 rounded-lg cursor-pointer hover:bg-accent/60">
+                          {item.label}
+                          <ChevronDown className="size-4 group-open:rotate-180 transition-transform" />
+                        </summary>
                         <div className="pl-3 pb-2 flex flex-col gap-2">
                           {item.groups.map((g, gi) => (
                             <div key={gi}>
@@ -255,15 +275,40 @@ export function Navbar() {
                                 </div>
                               )}
                               {g.links.map((l) => (
-                                <a key={l.label} href={l.href} className="block text-sm text-muted-foreground py-1.5">
-                                  {l.label}
-                                </a>
+                                l.href.startsWith("/") ? (
+                                  <Link key={l.label} to={l.href} onClick={() => setOpen(false)} className="block text-sm text-muted-foreground py-1.5">
+                                    {l.label}
+                                  </Link>
+                                ) : (
+                                  <a key={l.label} href={l.href} className="block text-sm text-muted-foreground py-1.5">
+                                    {l.label}
+                                  </a>
+                                )
                               ))}
                             </div>
                           ))}
                         </div>
-                      )}
-                    </details>
+                      </details>
+                    ) : (
+                      item.href?.startsWith("/") ? (
+                        <Link
+                          key={item.label}
+                          to={item.href}
+                          onClick={() => setOpen(false)}
+                          className="flex items-center justify-between text-sm font-semibold py-2.5 px-2 rounded-lg cursor-pointer hover:bg-accent/60"
+                        >
+                          {item.label}
+                        </Link>
+                      ) : (
+                        <a
+                          key={item.label}
+                          href={item.href ?? "#"}
+                          className="flex items-center justify-between text-sm font-semibold py-2.5 px-2 rounded-lg cursor-pointer hover:bg-accent/60"
+                        >
+                          {item.label}
+                        </a>
+                      )
+                    )
                   ))}
                   <a
                     href="#contact"
